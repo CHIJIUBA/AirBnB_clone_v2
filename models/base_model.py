@@ -4,14 +4,23 @@ Defines the BaseModel class.
 """
 from uuid import uuid4
 from datetime import datetime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, DATETIME
+
+Base = declarative_base()
 
 
 class BaseModel:
-    """Represent the base model.
+    """A base class for all hbnb models
 
-    defines all common attributes/methods for other classes.
-
+    Attributes:
+        id (sqlalchemy String): The BaseModel id.
+        created_at (sqlalchemy DateTime): The datetime at creation.
+        updated_at (sqlalchemy DateTime): The datetime of last update.
     """
+    id = Column(String(60), primary_key=True, nullable=False, unique=True)
+    created_at = Column(DATETIME, nullable=False, default=datetime.utcnow())
+    updated_at = Column(DATETIME, nullable=False, default=datetime.utcnow())
 
     def __init__(self, *args, **kwargs):
         """Initialize a new Base model.
@@ -31,7 +40,6 @@ class BaseModel:
             from models import storage
             self.id = str(uuid4())
             self.created_at = self.updated_at = datetime.now()
-            storage.new(self)
 
     def __str__(self):
         """Return the print() and str() representation the basemodel."""
@@ -42,6 +50,7 @@ class BaseModel:
         """updates the updated_at with the current datetime."""
         from models import storage
         self.updated_at = datetime.now()
+        storage.new(self)
         storage.save()
 
     def to_dict(self):
@@ -53,3 +62,8 @@ class BaseModel:
                 v = self.__dict__[k].isoformat()
                 dict_1[k] = v
         return dict_1
+
+    def delete(self):
+        '''deletes the current instance from the storage'''
+        from models import storage
+        storage.delete(self)

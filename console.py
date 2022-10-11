@@ -5,6 +5,7 @@ Contains the entry point of the command interpreter
 """
 from ast import arg
 import cmd
+import shlex
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
@@ -66,6 +67,27 @@ class HBNBCommand(cmd.Cmd):
         Eliminates empty lines
         """
         pass
+    
+    def _key_value_parser(self, args):
+        """creates a dictionary from a list of strings"""
+        new_dict = {}
+        for arg in args:
+            if "=" in arg:
+                kvp = arg.split('=', 1)
+                key = kvp[0]
+                value = kvp[1]
+                if value[0] == value[-1] == '"':
+                    value = shlex.split(value)[0].replace('_', ' ')
+                else:
+                    try:
+                        value = int(value)
+                    except:
+                        try:
+                            value = float(value)
+                        except:
+                            continue
+                new_dict[key] = value
+        return new_dict
 
     def do_show(self, line):
         """Prints a string representation of an instance.
@@ -115,9 +137,13 @@ class HBNBCommand(cmd.Cmd):
         of that class updates 'updated_at' attribute,
         and saves into JSON file
         """
+        new_dict = self._key_value_parser(args[1:])
+
         obj = eval(args[0])()
         obj.save()
         print(obj.id)
+        com = "{} {} {}".format(args[0], obj.id, new_dict)
+        self.do_update(com)
 
     def do_destroy(self, line):
         """Prints a string representation of an instance.

@@ -22,6 +22,17 @@ class FileStorage:
         Returns dictionary representation of all objects
         """
         return self.__objects
+    
+    # def all(self, cls=None):
+    #     """Returns a dictionary of models currently in storage"""
+    #     if cls is None:
+    #         return self.__objects
+    #     cls_name = cls.__name__
+    #     dct = {}
+    #     for key in self.__objects.keys():
+    #         if key.split('.')[0] == cls_name:
+    #             dct[key] = self.__objects[key]
+    #     return dct
 
     def new(self, object):
         """sets in __objects the object with the key

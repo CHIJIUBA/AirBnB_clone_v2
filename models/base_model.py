@@ -40,7 +40,6 @@ class BaseModel:
             from models import storage
             self.id = str(uuid4())
             self.created_at = self.updated_at = datetime.now()
-            storage.new(self)
 
     def __str__(self):
         """Return the print() and str() representation the basemodel."""
@@ -51,14 +50,31 @@ class BaseModel:
         """updates the updated_at with the current datetime."""
         from models import storage
         self.updated_at = datetime.now()
+        storage.new(self)
         storage.save()
 
+    # def to_dict(self):
+    #     """Return the dictionary representation of the basemodel."""
+    #     dict_1 = self.__dict__.copy()
+    #     dict_1["__class__"] = self.__class__.__name__
+    #     for k, v in self.__dict__.items():
+    #         if k in ("created_at", "updated_at"):
+    #             v = self.__dict__[k].isoformat()
+    #             dict_1[k] = v
+    #     return dict_1
+
     def to_dict(self):
-        """Return the dictionary representation of the basemodel."""
-        dict_1 = self.__dict__.copy()
-        dict_1["__class__"] = self.__class__.__name__
-        for k, v in self.__dict__.items():
-            if k in ("created_at", "updated_at"):
-                v = self.__dict__[k].isoformat()
-                dict_1[k] = v
-        return dict_1
+        """Convert instance into dict format"""
+        dct = self.__dict__.copy()
+        dct['__class__'] = self.__class__.__name__
+        for k in dct:
+            if type(dct[k]) is datetime:
+                dct[k] = dct[k].isoformat()
+        if '_sa_instance_state' in dct.keys():
+            del(dct['_sa_instance_state'])
+        return dct
+
+    def delete(self):
+        '''deletes the current instance from the storage'''
+        from models import storage
+        storage.delete(self)

@@ -67,7 +67,7 @@ class HBNBCommand(cmd.Cmd):
         Eliminates empty lines
         """
         pass
-    
+
     def _key_value_parser(self, args):
         """creates a dictionary from a list of strings"""
         new_dict = {}

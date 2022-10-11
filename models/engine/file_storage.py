@@ -17,16 +17,11 @@ class FileStorage:
     __file_path = "file.json"
     __objects = {}
 
-    def all(self, cls=None):
-        """Returns a dictionary of models currently in storage"""
-        if cls is None:
-            return self.__objects
-        cls_name = cls.__name__
-        dct = {}
-        for key in self.__objects.keys():
-            if key.split('.')[0] == cls_name:
-                dct[key] = self.__objects[key]
-        return dct
+    def all(self):
+        """
+        Returns dictionary representation of all objects
+        """
+        return self.__objects
 
     def new(self, object):
         """sets in __objects the object with the key
@@ -48,16 +43,6 @@ class FileStorage:
         with open(self.__file_path, 'w+') as f:
             json.dump({k: v.to_dict() for k, v in self.__objects.items()
                        }, f)
-    
-    def delete(self, obj=None):
-        ''' deletes the object obj from the attribute
-            __objects if it's inside it
-        '''
-        if obj is None:
-            return
-        obj_key = obj.to_dict()['__class__'] + '.' + obj.id
-        if obj_key in self.__objects.keys():
-            del self.__objects[obj_key]
 
     def reload(self):
         """

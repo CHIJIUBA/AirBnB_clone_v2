@@ -47,3 +47,37 @@ class DBStorage:
                 key = obj.__class__.__name__ + '.' + obj.id
                 dct[key] = obj
         return dct
+    
+    def new(self, obj):
+        '''adds the obj to the current db session'''
+        if obj is not None:
+            try:
+                self.__session.add(obj)
+                self.__session.flush()
+                self.__session.refresh(obj)
+            except Exception as ex:
+                self.__session.rollback()
+                raise ex
+
+    def save(self):
+        '''commit all changes of the current db session'''
+        self.__session.commit()
+
+    def delete(self, obj=None):
+        ''' deletes from the current databse session the obj
+            is it's not None
+        '''
+        if obj is not None:
+            self.__session.query(type(obj)).filter(
+                type(obj).id == obj.id).delete()
+
+    def reload(self):
+        '''reloads the database'''
+        Base.metadata.create_all(self.__engine)
+        session_factory = sessionmaker(bind=self.__engine,
+                                       expire_on_commit=False)
+        self.__session = scoped_session(session_factory)()
+
+    def close(self):
+        """closes the working SQLAlchemy session"""
+        self.__session.close()
